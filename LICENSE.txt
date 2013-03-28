@@ -1,0 +1,15 @@
+spice-html5 is Copyright (C) 2012 by Jeremy P. White <jwhite@codeweavers.com>
+
+Some portions of spice-html5 are copyright to their individual authors.
+Please refer to the individual source files and/or to the spice-html5 commit
+history: git://anongit.freedesktop.org/spice/spice-html5
+
+spice-html5 is licensed under the LGPL (GNU Lesser General Public License)
+
+The license texts are included at:
+    COPYING and
+    COPYING.LESSER
+
+Or alternatively the license texts may be found here:
+    http://www.gnu.org/licenses/lgpl.html and
+    http://www.gnu.org/licenses/gpl.html
