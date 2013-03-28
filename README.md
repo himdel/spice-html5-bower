@@ -19,11 +19,13 @@ Or install it yourself as:
 ## Usage
 
 Add in application.js or some per-controller .js.
+
     //= require spice-html5
 
 ## Source
 
 Spice home page: [http://www.spice-space.org](http://www.spice-space.org)
+
 Spice-html5 code is available here: git://anongit.freedesktop.org/spice/spice-html5
 
 ## Contributing
