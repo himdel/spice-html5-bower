@@ -1,32 +1,26 @@
-# Spice::Html5::Rails
+# spice-html5-bower
 
-The [spice-html5](/www.spice-space.com) for the Rails 3.1 asset pipeline.
+The [spice-html5](/www.spice-space.com) as a bower package. (Forked from [spice-html5-rails](https://github.com/abenari/spice-html5-rails).)
+
 
 ## Installation
 
-Add this line to your application's Gemfile:
+    bower install -S spice-html5-bower
 
-    gem 'spice-html5-rails'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install spice-html5-rails
 
 ## Usage
 
-Add in application.js or some per-controller .js.
+If you're using rails, add `//= require spice-html5-rails` in application.js or some per-controller .js.
 
-    //= require spice-html5
+Otherwise, include the files mentioned there.
+
 
 ## Source
 
 Spice home page: [http://www.spice-space.org](http://www.spice-space.org)
 
 Spice-html5 code is available here: git://anongit.freedesktop.org/spice/spice-html5
+
 
 ## Contributing
 

@@ -1,0 +1,14 @@
+{
+  "name": "spice-html5-bower",
+  "homepage": "http://www.spice-space.org",
+  "authors": [
+    "Martin Hradil <mhradil@redhat.com>",
+    "Amos Benari <abenari@redhat.com>"
+  ],
+  "description": "Spice HTML5 client packed for bower",
+  "main": "spice-html5-rails.js",
+  "moduleType": [
+    "globals"
+  ],
+  "license": "LGPL"
+}
