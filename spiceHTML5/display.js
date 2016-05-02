@@ -62,6 +62,12 @@ function SpiceDisplayConn()
 SpiceDisplayConn.prototype = Object.create(SpiceConn.prototype);
 SpiceDisplayConn.prototype.process_channel_message = function(msg)
 {
+    if (msg.type == SPICE_MSG_DISPLAY_MODE)
+    {
+        this.known_unimplemented(msg.type, "Display Mode");
+        return true;
+    }
+
     if (msg.type == SPICE_MSG_DISPLAY_MARK)
     {
         // FIXME - DISPLAY_MARK not implemented (may be hard or impossible)
@@ -171,8 +177,6 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
                       has_alpha: this.surfaces[draw_copy.data.src_bitmap.surface_id].format == SPICE_SURFACE_FMT_32_xRGB ? false : true,
                       descriptor : draw_copy.data.src_bitmap.descriptor
                     });
-
-                return true;
             }
             else if (draw_copy.data.src_bitmap.descriptor.type == SPICE_IMAGE_TYPE_JPEG)
             {
@@ -366,6 +370,60 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
         return true;
     }
 
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_OPAQUE)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Opaque");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_BLEND)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Blend");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_BLACKNESS)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Blackness");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_WHITENESS)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Whiteness");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_INVERS)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Invers");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_ROP3)
+    {
+        this.known_unimplemented(msg.type, "Display Draw ROP3");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_STROKE)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Stroke");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_TRANSPARENT)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Transparent");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_ALPHA_BLEND)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Alpha Blend");
+        return true;
+    }
+
     if (msg.type == SPICE_MSG_DISPLAY_COPY_BITS)
     {
         var copy_bits = new SpiceMsgDisplayCopyBits(msg.data);
@@ -399,6 +457,18 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
 
 
         this.surfaces[copy_bits.base.surface_id].draw_count++;
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_INVAL_ALL_PIXMAPS)
+    {
+        this.known_unimplemented(msg.type, "Display Inval All Pixmaps");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_INVAL_PALETTE)
+    {
+        this.known_unimplemented(msg.type, "Display Inval Palette");
         return true;
     }
 
@@ -446,8 +516,9 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
             /* This .save() is done entirely to enable SPICE_MSG_DISPLAY_RESET */
             canvas.context.save();
             document.getElementById(this.parent.screen_id).appendChild(canvas);
-            document.getElementById(this.parent.screen_id).setAttribute('width', m.surface.width);
-            document.getElementById(this.parent.screen_id).setAttribute('height', m.surface.height);
+
+            /* We're going to leave width dynamic, but correctly set the height */
+            document.getElementById(this.parent.screen_id).style.height = m.surface.height + "px";
             this.hook_events();
         }
         return true;
@@ -468,47 +539,53 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
         if (!this.streams)
             this.streams = new Array();
         if (this.streams[m.id])
-            console.log("Stream already exists");
+            console.log("Stream " + m.id + " already exists");
         else
             this.streams[m.id] = m;
         if (m.codec_type != SPICE_VIDEO_CODEC_TYPE_MJPEG)
-            console.log("Unhandled stream codec: "+m.codec_type);
+            console.log("Unhandled stream codec: " + m.codec_type);
         return true;
     }
 
-    if (msg.type == SPICE_MSG_DISPLAY_STREAM_DATA)
+    if (msg.type == SPICE_MSG_DISPLAY_STREAM_DATA ||
+        msg.type == SPICE_MSG_DISPLAY_STREAM_DATA_SIZED)
     {
-        var m = new SpiceMsgDisplayStreamData(msg.data);
+        var m;
+        if (msg.type == SPICE_MSG_DISPLAY_STREAM_DATA_SIZED)
+            m = new SpiceMsgDisplayStreamDataSized(msg.data);
+        else
+            m = new SpiceMsgDisplayStreamData(msg.data);
+
         if (!this.streams[m.base.id])
         {
             console.log("no stream for data");
             return false;
         }
+
+        var mmtime = (Date.now() - this.parent.our_mm_time) + this.parent.mm_time;
+        var latency = m.base.multi_media_time - mmtime;
+
         if (this.streams[m.base.id].codec_type === SPICE_VIDEO_CODEC_TYPE_MJPEG)
+            process_mjpeg_stream_data(this, m, latency);
+
+        if ("report" in this.streams[m.base.id])
+            process_stream_data_report(this, m, mmtime, latency);
+
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_STREAM_ACTIVATE_REPORT)
+    {
+        var m = new SpiceMsgDisplayStreamActivateReport(msg.data);
+
+        var report = new SpiceMsgcDisplayStreamReport(m.stream_id, m.unique_id);
+        if (this.streams[m.stream_id])
         {
-            var tmpstr = "data:image/jpeg,";
-            var img = new Image;
-            var i;
-            for (i = 0; i < m.data.length; i++)
-            {
-                tmpstr +=  '%';
-                if (m.data[i] < 16)
-                tmpstr += '0';
-                tmpstr += m.data[i].toString(16);
-            }
-            var strm_base = new SpiceMsgDisplayBase();
-            strm_base.surface_id = this.streams[m.base.id].surface_id;
-            strm_base.box = this.streams[m.base.id].dest;
-            strm_base.clip = this.streams[m.base.id].clip;
-            img.o =
-                { base: strm_base,
-                  tag: "mjpeg." + m.base.id,
-                  descriptor: null,
-                  sc : this,
-                };
-            img.onload = handle_draw_jpeg_onload;
-            img.src = tmpstr;
+            this.streams[m.stream_id].report = report;
+            this.streams[m.stream_id].max_window_size = m.max_window_size;
+            this.streams[m.stream_id].timeout_ms = m.timeout_ms
         }
+
         return true;
     }
 
@@ -527,6 +604,13 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
         this.streams[m.id] = undefined;
         return true;
     }
+
+    if (msg.type == SPICE_MSG_DISPLAY_STREAM_DESTROY_ALL)
+    {
+        this.known_unimplemented(msg.type, "Display Stream Destroy All");
+        return true;
+    }
+
     if (msg.type == SPICE_MSG_DISPLAY_INVAL_LIST)
     {
         var m = new SpiceMsgDisplayInvalList(msg.data);
@@ -535,6 +619,18 @@ SpiceDisplayConn.prototype.process_channel_message = function(msg)
         for (i = 0; i < m.count; i++)
             if (this.cache[m.resources[i].id] != undefined)
                 delete this.cache[m.resources[i].id];
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_MONITORS_CONFIG)
+    {
+        this.known_unimplemented(msg.type, "Display Monitors Config");
+        return true;
+    }
+
+    if (msg.type == SPICE_MSG_DISPLAY_DRAW_COMPOSITE)
+    {
+        this.known_unimplemented(msg.type, "Display Draw Composite");
         return true;
     }
 
@@ -690,7 +786,7 @@ SpiceDisplayConn.prototype.hook_events = function()
         canvas.addEventListener('keyup', handle_keyup);
         canvas.addEventListener('mouseout', handle_mouseout);
         canvas.addEventListener('mouseover', handle_mouseover);
-        canvas.addEventListener('mousewheel', handle_mousewheel);
+        canvas.addEventListener('wheel', handle_mousewheel);
         canvas.focus();
     }
 }
@@ -708,7 +804,7 @@ SpiceDisplayConn.prototype.unhook_events = function()
         canvas.removeEventListener('keyup', handle_keyup);
         canvas.removeEventListener('mouseout', handle_mouseout);
         canvas.removeEventListener('mouseover', handle_mouseover);
-        canvas.removeEventListener('mousewheel', handle_mousewheel);
+        canvas.removeEventListener('wheel', handle_mousewheel);
     }
 }
 
@@ -818,5 +914,60 @@ function handle_draw_jpeg_onload()
         }
 
         this.o.sc.surfaces[this.o.base.surface_id].draw_count++;
+    }
+}
+
+function process_mjpeg_stream_data(sc, m, latency)
+{
+    if (latency < 0)
+    {
+        if ("report" in sc.streams[m.base.id])
+            sc.streams[m.base.id].report.num_drops++;
+        return;
+    }
+
+    var tmpstr = "data:image/jpeg,";
+    var img = new Image;
+    var i;
+    for (i = 0; i < m.data.length; i++)
+    {
+        tmpstr +=  '%';
+        if (m.data[i] < 16)
+        tmpstr += '0';
+        tmpstr += m.data[i].toString(16);
+    }
+    var strm_base = new SpiceMsgDisplayBase();
+    strm_base.surface_id = sc.streams[m.base.id].surface_id;
+    strm_base.box = m.dest || sc.streams[m.base.id].dest;
+    strm_base.clip = sc.streams[m.base.id].clip;
+    img.o =
+        { base: strm_base,
+          tag: "mjpeg." + m.base.id,
+          descriptor: null,
+          sc : sc,
+        };
+    img.onload = handle_draw_jpeg_onload;
+    img.src = tmpstr;
+}
+
+function process_stream_data_report(sc, m, mmtime, latency)
+{
+    sc.streams[m.base.id].report.num_frames++;
+    if (sc.streams[m.base.id].report.start_frame_mm_time == 0)
+        sc.streams[m.base.id].report.start_frame_mm_time = m.base.multi_media_time;
+
+    if (sc.streams[m.base.id].report.num_frames > sc.streams[m.base.id].max_window_size ||
+        (m.base.multi_media_time - sc.streams[m.base.id].report.start_frame_mm_time) > sc.streams[m.base.id].timeout_ms)
+    {
+        sc.streams[m.base.id].report.end_frame_mm_time = m.base.multi_media_time;
+        sc.streams[m.base.id].report.last_frame_delay = latency;
+
+        var msg = new SpiceMiniData();
+        msg.build_msg(SPICE_MSGC_DISPLAY_STREAM_REPORT, sc.streams[m.base.id].report);
+        sc.send_msg(msg);
+
+        sc.streams[m.base.id].report.start_frame_mm_time = 0;
+        sc.streams[m.base.id].report.num_frames = 0;
+        sc.streams[m.base.id].report.num_drops = 0;
     }
 }
