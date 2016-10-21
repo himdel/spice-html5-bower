@@ -7,6 +7,14 @@ The [spice-html5](/www.spice-space.com) as a bower package. (Forked from [spice-
 
     bower install -S spice-html5-bower
 
+Or
+
+    npm install --save spice-html5-bower
+
+Or
+
+    yarn add spice-html5-bower
+
 
 ## Usage
 
@@ -20,6 +28,11 @@ Otherwise, include the files mentioned there.
 Spice home page: [http://www.spice-space.org](http://www.spice-space.org)
 
 Spice-html5 code is available here: git://anongit.freedesktop.org/spice/spice-html5
+
+
+## Note
+
+Since npm doesn't like 4-number-long version strings, dropping the leading 0 - therefore 0.1.6.1 is identical to 1.6.2 except for having added npm support.
 
 
 ## Contributing

@@ -1,0 +1,19 @@
+{
+  "name": "spice-html5-bower",
+  "version": "1.6.2",
+  "description": "Spice HTML5 client packaged for npm & bower",
+  "main": "spice-html5-rails.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/himdel/spice-html5-bower.git"
+  },
+  "author": "Amos Benari <abenari@redhat.com> (spice-html5-gem)",
+  "license": "LGPL-2.0",
+  "bugs": {
+    "url": "https://github.com/himdel/spice-html5-bower/issues"
+  },
+  "homepage": "https://github.com/himdel/spice-html5-bower#readme"
+}
