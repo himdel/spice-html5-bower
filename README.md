@@ -42,3 +42,10 @@ Since npm doesn't like 4-number-long version strings, dropping the leading 0 - t
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+
+## Local changes:
+
+   * https://github.com/himdel/spice-html5-bower/commit/84f79d0fc0d7ba5e52be6dcd5ffbb82151f1e424 - prevent extra `GET .../null` requests
+   * https://github.com/himdel/spice-html5-bower/commit/9821140d4d6c2980c7cc0fc55477ae2f3eeedf69 - actually use path when given
+
