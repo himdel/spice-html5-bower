@@ -10,5 +10,6 @@
   "moduleType": [
     "globals"
   ],
-  "license": "LGPL"
+  "license": "LGPL",
+  "version": "1.6.3"
 }
