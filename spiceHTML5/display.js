@@ -886,7 +886,8 @@ function handle_draw_jpeg_onload()
 
         // Give the Garbage collector a clue to recycle this; avoids
         //  fairly massive memory leaks during video playback
-        this.src = null;
+        // but setting this to null is equivalent to setting this to "null" (in chrome at least)
+        this.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
 
         if (this.o.descriptor && 
             (this.o.descriptor.flags & SPICE_IMAGE_FLAGS_CACHE_ME))
