@@ -28,3 +28,4 @@
 //= require ./spiceHTML5/playback.js
 //= require ./spiceHTML5/resize.js
 //= require ./spiceHTML5/webm.js
+//= require ./spiceHTML5/port.js
