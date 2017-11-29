@@ -1,6 +1,6 @@
 {
   "name": "spice-html5-bower",
-  "version": "1.6.3",
+  "version": "1.7.1",
   "description": "Spice HTML5 client packaged for npm & bower",
   "main": "spice-html5-rails.js",
   "scripts": {
