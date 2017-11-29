@@ -28,26 +28,27 @@
     <head>
 
         <title>Spice Javascript client</title>
-        <script src="spicearraybuffer.js"></script> 
-        <script src="enums.js"></script> 
-        <script src="atKeynames.js"></script> 
-        <script src="utils.js"></script> 
-        <script src="png.js"></script> 
-        <script src="lz.js"></script> 
-        <script src="quic.js"></script> 
-        <script src="bitmap.js"></script> 
-        <script src="spicedataview.js"></script> 
-        <script src="spicetype.js"></script> 
-        <script src="spicemsg.js"></script> 
-        <script src="wire.js"></script> 
-        <script src="spiceconn.js"></script> 
-        <script src="display.js"></script> 
-        <script src="main.js"></script> 
-        <script src="inputs.js"></script> 
+        <script src="spicearraybuffer.js"></script>
+        <script src="enums.js"></script>
+        <script src="atKeynames.js"></script>
+        <script src="utils.js"></script>
+        <script src="png.js"></script>
+        <script src="lz.js"></script>
+        <script src="quic.js"></script>
+        <script src="bitmap.js"></script>
+        <script src="spicedataview.js"></script>
+        <script src="spicetype.js"></script>
+        <script src="spicemsg.js"></script>
+        <script src="wire.js"></script>
+        <script src="spiceconn.js"></script>
+        <script src="display.js"></script>
+        <script src="port.js"></script>
+        <script src="main.js"></script>
+        <script src="inputs.js"></script>
         <script src="webm.js"></script>
         <script src="playback.js"></script>
         <script src="simulatecursor.js"></script>
-        <script src="cursor.js"></script> 
+        <script src="cursor.js"></script>
         <script src="thirdparty/jsbn.js"></script>
         <script src="thirdparty/rsa.js"></script>
         <script src="thirdparty/prng4.js"></script>
@@ -71,8 +72,8 @@
             {
                 var host, port, password, scheme = "ws://", uri;
 
-                host = document.getElementById("host").value; 
-                port = document.getElementById("port").value; 
+                host = document.getElementById("host").value;
+                port = document.getElementById("port").value;
                 password = document.getElementById("password").value;
 
 
@@ -92,7 +93,7 @@
 
                 try
                 {
-                    sc = new SpiceMainConn({uri: uri, screen_id: "spice-screen", dump_id: "debug-div", 
+                    sc = new SpiceMainConn({uri: uri, screen_id: "spice-screen", dump_id: "debug-div",
                                 message_id: "message-div", password: password, onerror: spice_error, onagent: agent_connected });
                 }
                 catch (e)
@@ -142,6 +143,35 @@
                 }
             }
 
+            function toggle_console()
+            {
+                var checkbox = document.getElementById('show_console');
+                var m = document.getElementById('message-div');
+
+                if (checkbox.checked)
+                {
+                    m.style.display = 'block';
+                }
+                else
+                {
+                    m.style.display = 'none';
+                }
+
+                window.addEventListener('resize', handle_resize);
+                resize_helper(sc);
+            }
+            /* SPICE port event listeners
+            window.addEventListener('spice-port-data', function(event) {
+                // Here we convert data to text, but really we can obtain binary data also
+                var msg_text = arraybuffer_to_str(new Uint8Array(event.detail.data));
+                DEBUG > 0 && console.log('SPICE port', event.detail.channel.portName, 'message text:', msg_text);
+            });
+
+            window.addEventListener('spice-port-event', function(event) {
+                DEBUG > 0 && console.log('SPICE port', event.detail.channel.portName, 'event data:', event.detail.spiceEvent);
+            });
+            */
+
         </script>
 
     </head>
@@ -153,6 +183,7 @@
             <label for="host">Host:</label> <input type='text' id='host' value='localhost'> <!-- localhost -->
             <label for="port">Port:</label> <input type='text' id='port' value='5959'>
             <label for="password">Password:</label> <input type='password' id='password' value=''>
+            <label for="show_console">Show console </label><input type="checkbox" id="show_console" value="1" onchange="toggle_console()" checked>
             <button id="connectButton" onclick="connect();">Start</button>
         </div>
 

@@ -22,7 +22,7 @@
 **  SpiceMainConn
 **      This is the master Javascript class for establishing and
 **  managing a connection to a Spice Server.
-**  
+**
 **      Invocation:  You must pass an object with properties as follows:
 **          uri         (required)  Uri of a WebSocket listener that is
 **                                  connected to a spice server.
@@ -59,6 +59,7 @@ function SpiceMainConn()
     this.file_xfer_tasks = {};
     this.file_xfer_task_id = 0;
     this.file_xfer_read_queue = [];
+    this.ports = [];
 }
 
 SpiceMainConn.prototype = Object.create(SpiceConn.prototype);
@@ -144,7 +145,12 @@ SpiceMainConn.prototype.process_channel_message = function(msg)
                         chan_id : chans.channels[i].id
                     };
             if (chans.channels[i].type == SPICE_CHANNEL_DISPLAY)
-                this.display = new SpiceDisplayConn(conn);
+            {
+                if (this.display !== undefined)
+                    this.log_warn("The spice-html5 client does not handle multiple heads.");
+                else
+                    this.display = new SpiceDisplayConn(conn);
+            }
             else if (chans.channels[i].type == SPICE_CHANNEL_INPUTS)
             {
                 this.inputs = new SpiceInputsConn(conn);
@@ -154,6 +160,8 @@ SpiceMainConn.prototype.process_channel_message = function(msg)
                 this.cursor = new SpiceCursorConn(conn);
             else if (chans.channels[i].type == SPICE_CHANNEL_PLAYBACK)
                 this.cursor = new SpicePlaybackConn(conn);
+            else if (chans.channels[i].type == SPICE_CHANNEL_PORT)
+                this.ports.push(new SpicePortConn(conn));
             else
             {
                 if (! ("extra_channels" in this))
@@ -478,3 +486,9 @@ SpiceMainConn.prototype.handle_mouse_mode = function(current, supported)
         this.inputs.mouse_mode = current;
 }
 
+/* Shift current time to attempt to get a time matching that of the server */
+SpiceMainConn.prototype.relative_now = function()
+{
+    var ret = (Date.now() - this.our_mm_time) + this.mm_time;
+    return ret;
+}

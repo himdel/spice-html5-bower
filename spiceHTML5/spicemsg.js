@@ -21,7 +21,7 @@
 /*----------------------------------------------------------------------------
 **  Spice messages
 **      This file contains classes for passing messages to and from
-**  a spice server.  This file should arguably be generated from 
+**  a spice server.  This file should arguably be generated from
 **  spice.proto, but it was instead put together by hand.
 **--------------------------------------------------------------------------*/
 function SpiceLinkHeader(a, at)
@@ -63,7 +63,7 @@ SpiceLinkHeader.prototype =
         dv.setUint32(at, this.size, true); at += 4;
     },
     buffer_size: function()
-    { 
+    {
         return 16;
     },
 }
@@ -938,7 +938,7 @@ function SpiceMsgcMousePosition(sc, e)
         this.x = e.clientX - sc.display.surfaces[sc.display.primary_surface].canvas.offsetLeft + scrollLeft;
         this.y = e.clientY - sc.display.surfaces[sc.display.primary_surface].canvas.offsetTop + scrollTop;
         sc.mousex = this.x;
-        sc.mousey = this.y; 
+        sc.mousey = this.y;
     }
     else
     {
@@ -1277,4 +1277,22 @@ SpiceMsgDisplayInvalList.prototype =
             this.resources[i].id = dv.getUint64(at, true); at += 8;
         }
     },
+}
+
+function SpiceMsgPortInit(a, at)
+{
+    this.from_buffer(a,at);
+};
+
+SpiceMsgPortInit.prototype =
+{
+    from_buffer: function (a, at)
+    {
+        at = at || 0;
+        var dv = new SpiceDataView(a);
+        var namesize = dv.getUint32(at, true); at += 4;
+        var offset = dv.getUint32(at, true); at += 4;
+        this.opened = dv.getUint8(at, true); at += 1;
+        this.name = a.slice(offset, offset + namesize - 1);
+    }
 }

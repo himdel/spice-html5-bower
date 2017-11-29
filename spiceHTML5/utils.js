@@ -22,9 +22,16 @@
 **  Utility settings and functions for Spice
 **--------------------------------------------------------------------------*/
 var DEBUG = 0;
+var PLAYBACK_DEBUG = 0;
+var STREAM_DEBUG = 0;
 var DUMP_DRAWS = false;
 var DUMP_CANVASES = false;
 
+/*----------------------------------------------------------------------------
+**  We use an Image temporarily, and the image/src does not get garbage
+**   collected as quickly as we might like.  This blank image helps with that.
+**--------------------------------------------------------------------------*/
+var EMPTY_GIF_IMAGE = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
 
 /*----------------------------------------------------------------------------
 **  combine_array_buffers
@@ -95,6 +102,13 @@ function hexdump_buffer(a)
             hex = str = "";
         }
     }
+}
+
+/*----------------------------------------------------------------------------
+**  Convert arraybuffer to string
+**--------------------------------------------------------------------------*/
+function arraybuffer_to_str(buf) {
+  return String.fromCharCode.apply(null, new Uint16Array(buf));
 }
 
 /*----------------------------------------------------------------------------
@@ -262,4 +276,57 @@ function keycode_to_end_scan(code)
     } else {
         return 0x80e0 | ((scancode - 0x100) << 8);
     }
+}
+
+function dump_media_element(m)
+{
+    var ret =
+            "[networkState " + m.networkState +
+            "|readyState " + m.readyState +
+            "|error " + m.error +
+            "|seeking " + m.seeking +
+            "|duration " + m.duration +
+            "|paused " + m.paused +
+            "|ended " + m.error +
+            "|buffered " + dump_timerange(m.buffered) +
+            "]";
+    return ret;
+}
+
+function dump_media_source(ms)
+{
+    var ret =
+            "[duration " + ms.duration +
+            "|readyState " + ms.readyState + "]";
+    return ret;
+}
+
+function dump_source_buffer(sb)
+{
+    var ret =
+            "[appendWindowStart " + sb.appendWindowStart +
+            "|appendWindowEnd " + sb.appendWindowEnd +
+            "|buffered " + dump_timerange(sb.buffered) +
+            "|timeStampOffset " + sb.timeStampOffset +
+            "|updating " + sb.updating +
+            "]";
+    return ret;
+}
+
+function dump_timerange(tr)
+{
+    var ret;
+
+    if (tr)
+    {
+        var i = tr.length;
+        ret = "{len " + i;
+        if (i > 0)
+            ret += "; start " + tr.start(0) + "; end " + tr.end(i - 1);
+        ret += "}";
+    }
+    else
+        ret = "N/A";
+
+    return ret;
 }
