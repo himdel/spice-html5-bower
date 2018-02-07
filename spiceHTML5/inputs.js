@@ -184,8 +184,10 @@ function handle_keyup(e)
     e.preventDefault();
 }
 
-function sendCtrlAltDel()
+function sendCtrlAltDel(smc)
 {
+    sc = smc === undefined ? sc : smc
+    
     if (sc && sc.inputs && sc.inputs.state === "ready"){
         var key = new SpiceMsgcKeyDown();
         var msg = new SpiceMiniData();
