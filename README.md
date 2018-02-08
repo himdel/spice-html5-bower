@@ -48,4 +48,4 @@ Since npm doesn't like 4-number-long version strings, dropping the leading 0 - t
 
    * ~~https://github.com/himdel/spice-html5-bower/commit/84f79d0fc0d7ba5e52be6dcd5ffbb82151f1e424 - prevent extra `GET .../null` requests~~ (not needed in 0.1.7+)
    * ~~https://github.com/himdel/spice-html5-bower/commit/9821140d4d6c2980c7cc0fc55477ae2f3eeedf69 - actually use path when given~~ (not needed in 0.1.7+)
-
+   * https://github.com/himdel/spice-html5-bower/pull/1 - have `sendCtrlAltDel` handle custom SpiceMainConn instances
