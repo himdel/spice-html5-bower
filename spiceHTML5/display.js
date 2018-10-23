@@ -769,6 +769,12 @@ SpiceDisplayConn.prototype.log_draw = function(prefix, draw)
             str += "; src_bitmap type " + draw.data.src_bitmap.descriptor.type + ", flags " + draw.data.src_bitmap.descriptor.flags;
             if (draw.data.src_bitmap.surface_id !== undefined)
                 str += "; src_bitmap surface_id " + draw.data.src_bitmap.surface_id;
+            if (draw.data.src_bitmap.bitmap)
+                str += "; BITMAP format " + draw.data.src_bitmap.bitmap.format +
+                        "; flags " + draw.data.src_bitmap.bitmap.flags +
+                        "; x " + draw.data.src_bitmap.bitmap.x +
+                        "; y " + draw.data.src_bitmap.bitmap.y +
+                        "; stride " + draw.data.src_bitmap.bitmap.stride ;
             if (draw.data.src_bitmap.quic)
                 str += "; QUIC type " + draw.data.src_bitmap.quic.type +
                         "; width " + draw.data.src_bitmap.quic.width +

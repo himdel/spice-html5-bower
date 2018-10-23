@@ -146,10 +146,11 @@ SpiceMainConn.prototype.process_channel_message = function(msg)
                     };
             if (chans.channels[i].type == SPICE_CHANNEL_DISPLAY)
             {
-                if (this.display !== undefined)
-                    this.log_warn("The spice-html5 client does not handle multiple heads.");
-                else
+                if (chans.channels[i].id == 0) {
                     this.display = new SpiceDisplayConn(conn);
+                } else {
+                    this.log_warn("The spice-html5 client does not handle multiple heads.");
+                }
             }
             else if (chans.channels[i].type == SPICE_CHANNEL_INPUTS)
             {
